@@ -1,0 +1,27 @@
+[package]
+name = "tackt-macros"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0-or-later"
+description = "HTTP router"
+homepage = "https://gitlab.com/arch-mage/tackt"
+repository = "https://gitlab.com/arch-mage/tackt"
+documentation = "https://docs.rs/tackt"
+
+[lib]
+proc-macro = true
+
+[dependencies.syn]
+version = "1.0"
+default-features = false
+features = ["clone-impls", "derive", "extra-traits", "full", "parsing", "printing", "proc-macro"]
+
+[dependencies.quote]
+version = "1.0"
+default-features = false
+features = ["proc-macro"]
+
+[dependencies.proc-macro2]
+version = "1.0"
+default-features = false
+features = ["proc-macro"]

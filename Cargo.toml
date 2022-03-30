@@ -1,0 +1,60 @@
+[workspace]
+members = [
+    ".",
+    "macros",
+]
+
+[package]
+name = "tackt"
+version = "0.1.0"
+readme = "README.md"
+edition = "2021"
+description = "HTTP router"
+homepage = "https://gitlab.com/arch-mage/tackt"
+repository = "https://gitlab.com/arch-mage/tackt"
+documentation = "https://docs.rs/tackt"
+license = "GPL-3.0-or-later"
+keywords = ["http"]
+categories = ["Network Programming"]
+authors = ["M. Awad Syahid <m.awad.syahid@gmail.com>"]
+
+[package.metadata.docs.rs]
+features = ["hyper", "macros"]
+rustdoc-args = ["--cfg", "docsrs"]
+
+[features]
+default = ["hyper", "macros"]
+macros = ["tackt-macros"]
+
+[dependencies.http]
+version = "0.2"
+default-features = false
+
+[dependencies.tower-service]
+version = "0.3"
+default-features = false
+
+[dependencies.pin-project]
+version = "1.0"
+default-features = false
+
+[dependencies.hyper]
+version = "0.14"
+optional = true
+default-features = false
+features = ["server", "tcp", "http1", "http2"]
+
+[dependencies.tackt-macros]
+path = "macros"
+version = "0.1"
+optional = true
+
+[[test]]
+name = "macros"
+path = "tests/macros.rs"
+required-features = ["macros"]
+
+[[example]]
+name = "server"
+path = "examples/server.rs"
+required-features = ["hyper", "macros"]
