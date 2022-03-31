@@ -7,7 +7,6 @@ use syn::LitStr;
 use syn::Result;
 use syn::Token;
 
-#[derive(Clone, Debug)]
 pub(crate) struct Spec {
     pub(crate) methods: Vec<Ident>,
     pub(crate) segments: Vec<Segment>,
@@ -116,7 +115,6 @@ fn parse_segments(input: ParseStream) -> Result<Vec<Segment>> {
     Ok(segments)
 }
 
-#[derive(Clone, Debug)]
 pub(crate) enum Segment {
     Lit(LitStr),
     Param(Ident),
