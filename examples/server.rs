@@ -3,10 +3,7 @@ use std::net::SocketAddr;
 
 use http::Request;
 use http::Response;
-use hyper::server::conn::AddrIncoming;
-use hyper::server::conn::AddrStream;
 use hyper::service::make_service_fn;
-use hyper::service::Service;
 use hyper::Body;
 use hyper::Server;
 
@@ -32,17 +29,23 @@ async fn resource(_: Request<Body>, id: i32, path: String) -> Result<Response<Bo
     Ok(Response::new(Body::from(format!("resource: {id} {path}"))))
 }
 
-async fn run(addr: SocketAddr) -> Server<AddrIncoming, impl Service<&'static AddrStream>> {
+async fn run(addr: SocketAddr) -> Result<(), Box<dyn std::error::Error>> {
     let router = tackt::routes![home, about, entity, resource,];
 
-    let make_svc = make_service_fn(move |_| async move { Ok::<_, Infallible>(router) });
+    Server::bind(&addr)
+        .serve(make_service_fn(move |_| async move {
+            Ok::<_, Infallible>(router)
+        }))
+        .await?;
 
-    Server::bind(&addr).serve(make_svc)
+    Ok(())
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = SocketAddr::from(([127, 0, 0, 1], 5000));
 
-    // NOTE: this requires an async executor
-    let _ = run(addr);
+    tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()?
+        .block_on(run(addr))
 }

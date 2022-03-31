@@ -48,6 +48,11 @@ version = "0.14"
 default-features = false
 features = ["server", "tcp", "http1", "http2"]
 
+[dev-dependencies.tokio]
+version = "1.17"
+default-features = false
+features = ["rt"]
+
 [[test]]
 name = "test"
 path = "tests/test.rs"
