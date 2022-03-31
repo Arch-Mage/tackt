@@ -15,7 +15,7 @@ repository = "https://gitlab.com/arch-mage/tackt"
 documentation = "https://docs.rs/tackt"
 license = "GPL-3.0-or-later"
 keywords = ["http"]
-categories = ["Network Programming"]
+categories = ["network-programming"]
 authors = ["M. Awad Syahid <m.awad.syahid@gmail.com>"]
 
 [package.metadata.docs.rs]
