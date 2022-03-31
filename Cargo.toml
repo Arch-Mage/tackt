@@ -50,8 +50,8 @@ version = "0.1"
 optional = true
 
 [[test]]
-name = "macros"
-path = "tests/macros.rs"
+name = "test"
+path = "tests/test.rs"
 required-features = ["macros"]
 
 [[example]]

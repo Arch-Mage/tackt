@@ -19,6 +19,7 @@ mod param;
 mod request;
 mod route;
 mod router;
+mod with;
 
 #[cfg(feature = "hyper")]
 #[cfg_attr(docsrs, doc(cfg(feature = "hyper")))]

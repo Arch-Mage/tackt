@@ -30,6 +30,16 @@ pub trait Param<T>: Sized {
     fn from_request(req: &T) -> Result<Self, Error>;
 }
 
+#[derive(Clone, Copy, Debug)]
+pub struct Through;
+
+impl<T> Param<T> for Through {
+    #[inline]
+    fn from_request(_: &T) -> Result<Self, Error> {
+        Ok(Through)
+    }
+}
+
 #[cfg(feature = "macros")]
 #[cfg_attr(docsrs, doc(cfg(feature = "macros")))]
 pub use tackt_macros::Param;

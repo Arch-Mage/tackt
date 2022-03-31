@@ -10,6 +10,7 @@ use crate::param::Param;
 use crate::request::PathReq;
 use crate::request::RemovePrefix;
 use crate::route::Route;
+use crate::with::With;
 
 /// The router instance.
 ///
@@ -84,6 +85,19 @@ impl<R> Router<R> {
     {
         Router {
             inner: Or::new(self.inner, Mount::new(service, prefix)),
+        }
+    }
+
+    /// Add middleware to the router.
+    #[inline]
+    pub fn with<F, T, Fut>(self, func: F) -> Router<With<R, F>>
+    where
+        R: Clone + Service<T>,
+        F: FnMut(T) -> Fut,
+        Fut: Future<Output = Result<T, R::Error>>,
+    {
+        Router {
+            inner: With::new(self.inner, func),
         }
     }
 

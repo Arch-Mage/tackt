@@ -2,7 +2,7 @@ use tower_service::Service;
 
 use crate::error::Error;
 use crate::future::Maybe;
-use crate::param;
+use crate::param::Through;
 use crate::request::PathReq;
 use crate::request::RemovePrefix;
 use crate::route::Route;
@@ -60,23 +60,13 @@ where
     }
 }
 
-#[derive(Clone, Copy, Debug)]
-pub struct Param;
-
-impl<T> param::Param<T> for Param {
-    #[inline]
-    fn from_request(_: &T) -> Result<Self, Error> {
-        Ok(Param)
-    }
-}
-
 impl<S, T> Route<T> for Mount<S>
 where
     S: Service<T>,
     T: PathReq + RemovePrefix,
     S::Error: From<Error>,
 {
-    type Param = Param;
+    type Param = Through;
 
     fn call_with_param(&mut self, req: T, _: Self::Param) -> Self::Future {
         self.call(req)
