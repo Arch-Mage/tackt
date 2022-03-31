@@ -100,26 +100,15 @@ impl<R> Router<R> {
             inner: With::new(self.inner, func),
         }
     }
-
-    /// A shortcut for hyper::service::make_service_fn
-    #[cfg(feature = "hyper")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "hyper")))]
-    pub fn make<T>(self) -> crate::make::Make<Router<R>, T>
-    where
-        R: Service<T>,
-    {
-        crate::make::Make::new(self)
-    }
 }
 
-#[cfg(all(test, feature = "hyper"))]
-mod hyper {
+#[cfg(test)]
+mod tests {
     use std::convert::Infallible;
     use std::net::SocketAddr;
 
     use http::Request;
     use http::Response;
-    use hyper::server::conn::AddrIncoming;
     use hyper::service::make_service_fn;
     use hyper::Body;
 
@@ -172,11 +161,12 @@ mod hyper {
     fn compile() {
         let subrouter = Router::new(home).route(about);
         let router = Router::new(home).route(about).mount("/sub", subrouter);
-        make_service_fn(|_: &AddrIncoming| async move { Ok::<_, Infallible>(router) });
-        router.make();
+
         let _ = |addr: SocketAddr| async move {
             let _ = hyper::server::Server::bind(&addr)
-                .serve(router.make())
+                .serve(make_service_fn(
+                    |_| async move { Ok::<_, Infallible>(router) },
+                ))
                 .await;
         };
     }

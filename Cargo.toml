@@ -19,11 +19,11 @@ categories = ["Network Programming"]
 authors = ["M. Awad Syahid <m.awad.syahid@gmail.com>"]
 
 [package.metadata.docs.rs]
-features = ["hyper", "macros"]
+features = ["macros"]
 rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
-default = ["hyper", "macros"]
+default = ["macros"]
 macros = ["tackt-macros"]
 
 [dependencies.http]
@@ -38,16 +38,15 @@ default-features = false
 version = "1.0"
 default-features = false
 
-[dependencies.hyper]
-version = "0.14"
-optional = true
-default-features = false
-features = ["server", "tcp", "http1", "http2"]
-
 [dependencies.tackt-macros]
 path = "macros"
 version = "0.1"
 optional = true
+
+[dev-dependencies.hyper]
+version = "0.14"
+default-features = false
+features = ["server", "tcp", "http1", "http2"]
 
 [[test]]
 name = "test"
@@ -57,4 +56,4 @@ required-features = ["macros"]
 [[example]]
 name = "server"
 path = "examples/server.rs"
-required-features = ["hyper", "macros"]
+required-features = ["macros"]

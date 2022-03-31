@@ -100,10 +100,6 @@ mod route;
 mod router;
 mod with;
 
-#[cfg(feature = "hyper")]
-#[cfg_attr(docsrs, doc(cfg(feature = "hyper")))]
-mod make;
-
 #[cfg(test)]
 mod exec;
 
