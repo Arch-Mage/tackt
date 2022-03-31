@@ -6,12 +6,12 @@ members = [
 
 [package]
 name = "tackt"
-version = "0.1.0"
+version = "0.1.1"
 readme = "README.md"
 edition = "2021"
 description = "HTTP router"
-homepage = "https://gitlab.com/arch-mage/tackt"
-repository = "https://gitlab.com/arch-mage/tackt"
+homepage = "https://github.com/arch-mage/tackt"
+repository = "https://github.com/arch-mage/tackt"
 documentation = "https://docs.rs/tackt"
 license = "GPL-3.0-or-later"
 keywords = ["http"]

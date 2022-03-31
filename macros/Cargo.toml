@@ -1,11 +1,11 @@
 [package]
 name = "tackt-macros"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "GPL-3.0-or-later"
 description = "HTTP router"
-homepage = "https://gitlab.com/arch-mage/tackt"
-repository = "https://gitlab.com/arch-mage/tackt"
+homepage = "https://github.com/arch-mage/tackt"
+repository = "https://github.com/arch-mage/tackt"
 documentation = "https://docs.rs/tackt"
 
 [lib]
