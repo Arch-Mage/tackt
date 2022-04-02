@@ -98,6 +98,7 @@ mod param;
 mod request;
 mod route;
 mod router;
+mod void;
 mod with;
 
 #[cfg(test)]
@@ -107,6 +108,7 @@ pub use error::Error;
 pub use param::Param;
 pub use route::Route;
 pub use router::Router;
+pub use void::Void;
 
 pub use request::MethodReq;
 pub use request::PathReq;

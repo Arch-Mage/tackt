@@ -104,9 +104,10 @@ mod tests {
 
     #[test]
     fn test() {
+        let root = Router::void();
         let r1 = Router::new(home);
         let r2 = Router::new(mounted);
-        let router = r1.mount("/prefix", r2);
+        let router = root.mount("/", r1).mount("/prefix", r2);
 
         let res = run(router, req("/"));
         assert_eq!(res, Ok("home"));

@@ -10,6 +10,7 @@ use crate::param::Param;
 use crate::request::PathReq;
 use crate::request::RemovePrefix;
 use crate::route::Route;
+use crate::void::Void;
 use crate::with::With;
 
 /// The router instance.
@@ -39,6 +40,13 @@ where
 
     fn call(&mut self, req: T) -> Self::Future {
         self.inner.call(req)
+    }
+}
+
+impl<T, U> Router<Void<T, U>> {
+    /// Create a router that does not match any request.
+    pub const fn void() -> Router<Void<T, U>> {
+        Router { inner: Void::new() }
     }
 }
 
