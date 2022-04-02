@@ -119,6 +119,18 @@ pub use or::Or;
 pub use http::Method;
 pub use tower_service::Service;
 
+/// The attribute to describe route's spec.
+///
+/// See [the top-level documentation][lib].
+///
+/// [lib]: index.html
 #[cfg(feature = "macros")]
 #[cfg_attr(docsrs, doc(cfg(feature = "macros")))]
 pub use tackt_macros::route;
+
+/// Derive [`Param`][crate::param::Param] for struct.
+///
+/// See [`Param` doc][crate::param::Param].
+#[cfg(feature = "macros")]
+#[cfg_attr(docsrs, doc(cfg(feature = "macros")))]
+pub use tackt_macros::Param;

@@ -104,10 +104,8 @@ where
 mod tests {
     use std::future::ready;
 
-    use tower_service::Service;
-
     use crate::error::Error;
-    use crate::exec::oneshot;
+    use crate::exec::run;
     use crate::func::Func;
     use crate::or::Or;
     use crate::param::Param;
@@ -137,20 +135,20 @@ mod tests {
             }
         }
 
-        let mut or = Or::new(
+        let or = Or::new(
             Func::new(|_: &str, param: Left| ready(Ok::<_, Error>(param.0))),
             Func::new(|_: &str, param: Right| ready(Ok::<_, Error>(param.0))),
         );
 
-        let res = oneshot(or.call("/"));
+        let res = run(or, "/");
         assert!(matches!(res, Err(Error::Path)));
-        let res = oneshot(or.call("/left"));
+        let res = run(or, "/left");
         assert!(matches!(res, Err(Error::Path)));
-        let res = oneshot(or.call("/right"));
+        let res = run(or, "/right");
         assert!(matches!(res, Err(Error::Path)));
-        let res = oneshot(or.call("/left/1"));
+        let res = run(or, "/left/1");
         assert!(matches!(res, Ok(1)));
-        let res = oneshot(or.call("/right/2"));
+        let res = run(or, "/right/2");
         assert!(matches!(res, Ok(2)));
     }
 }

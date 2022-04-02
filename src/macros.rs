@@ -34,3 +34,63 @@ macro_rules! routes {
         $crate::routes!($($rest),+).route($route)
     }
 }
+
+/// Generate an empty struct that implements [`Param`][crate::param::Param].
+#[cfg(test)]
+macro_rules! param {
+    ($Type:ident, $method:ident, $path:expr) => {
+        struct $Type;
+
+        impl<T> $crate::param::Param<::http::request::Request<T>> for $Type {
+            #[inline]
+            fn from_request(
+                req: &::http::request::Request<T>,
+            ) -> Result<Self, $crate::error::Error> {
+                if req.method() != &::http::Method::$method {
+                    return Err($crate::error::Error::Method);
+                }
+
+                if req.uri().path() != $path {
+                    return Err($crate::error::Error::Path);
+                }
+
+                Ok($Type)
+            }
+        }
+    };
+    ($Type:ident, $method:ident) => {
+        struct $Type;
+
+        impl<T> $crate::param::Param<::http::request::Request<T>> for $Type {
+            #[inline]
+            fn from_request(
+                req: &::http::request::Request<T>,
+            ) -> Result<Self, $crate::error::Error> {
+                if req.uri().path() != $path {
+                    return Err($crate::error::Error::Path);
+                }
+
+                Ok($Type)
+            }
+        }
+    };
+    ($Type:ident, $path:expr) => {
+        struct $Type;
+
+        impl<T> $crate::param::Param<::http::request::Request<T>> for $Type {
+            #[inline]
+            fn from_request(
+                req: &::http::request::Request<T>,
+            ) -> Result<Self, $crate::error::Error> {
+                if req.uri().path() != $path {
+                    return Err($crate::error::Error::Path);
+                }
+
+                Ok($Type)
+            }
+        }
+    };
+}
+
+#[cfg(test)]
+pub(crate) use param;

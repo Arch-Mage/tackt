@@ -39,7 +39,3 @@ impl<T> Param<T> for Through {
         Ok(Through)
     }
 }
-
-#[cfg(feature = "macros")]
-#[cfg_attr(docsrs, doc(cfg(feature = "macros")))]
-pub use tackt_macros::Param;

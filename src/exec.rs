@@ -1,19 +1,16 @@
-#![allow(dead_code)]
-
 use std::future::Future;
-use std::pin::Pin;
 use std::sync::Arc;
 use std::task::Context;
 use std::task::Poll;
 use std::task::Wake;
-use std::thread;
-use std::thread::Thread;
 
-pub(crate) struct Waker(Thread);
+use tower_service::Service;
+
+pub(crate) struct Waker(std::thread::Thread);
 
 impl Waker {
     pub(crate) fn new() -> Arc<Waker> {
-        Arc::new(Waker(thread::current()))
+        Arc::new(Waker(std::thread::current()))
     }
 }
 
@@ -23,32 +20,22 @@ impl Wake for Waker {
     }
 }
 
-pub(crate) struct Executor<'a, F> {
-    fut: Pin<Box<F>>,
-    ctx: Context<'a>,
-}
-
-impl<'a, F> Executor<'a, F>
-where
-    F: Future,
-{
-    pub(crate) fn new(future: F, waker: &'a std::task::Waker) -> Executor<'a, F> {
-        Executor {
-            fut: Box::pin(future),
-            ctx: Context::from_waker(waker),
-        }
-    }
-
-    pub(crate) fn run(&mut self) -> Poll<F::Output> {
-        self.fut.as_mut().poll(&mut self.ctx)
-    }
-}
-
-pub(crate) fn oneshot<T>(future: impl Future<Output = T>) -> T {
+/// Execute an async.
+pub(crate) fn oneshot<T>(fut: impl Future<Output = T>) -> T {
+    let mut fut = Box::pin(fut);
     let waker = Waker::new().into();
-    let mut exec = Executor::new(future, &waker);
-    match exec.run() {
+    let mut cx = Context::from_waker(&waker);
+
+    match fut.as_mut().poll(&mut cx) {
         Poll::Ready(out) => out,
-        Poll::Pending => panic!("future still pending"),
+        Poll::Pending => panic!("still pending!!!"),
     }
+}
+
+/// Run a service.
+pub(crate) fn run<S, T>(mut service: S, req: T) -> Result<S::Response, S::Error>
+where
+    S: Service<T>,
+{
+    oneshot(service.call(req))
 }

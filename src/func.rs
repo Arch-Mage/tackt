@@ -93,8 +93,6 @@ where
 
 #[cfg(test)]
 mod tests {
-    use tower_service::Service;
-
     use super::Error;
     use super::Func;
 
@@ -112,10 +110,10 @@ mod tests {
             }
         }
 
-        let mut func = Func::new(|_: &'static str, param: Param| async { Ok::<_, Error>(param) });
-        let res = crate::exec::oneshot(func.call("/"));
+        let func = Func::new(|_: &'static str, param: Param| async { Ok::<_, Error>(param) });
+        let res = crate::exec::run(func, "/");
         assert!(matches!(res, Ok(Param)));
-        let res = crate::exec::oneshot(func.call("/somewhere"));
+        let res = crate::exec::run(func, "/somewhere");
         assert!(matches!(res, Err(Error::Path)));
     }
 }

@@ -25,6 +25,7 @@ impl<S> Mount<S> {
         T: PathReq + RemovePrefix,
         S::Error: From<Error>,
     {
+        debug_assert!(!prefix.contains('?') && !prefix.contains('#'));
         Mount { inner, prefix }
     }
 }
@@ -70,5 +71,47 @@ where
 
     fn call_with_param(&mut self, req: T, _: Self::Param) -> Self::Future {
         self.call(req)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use http::Request;
+
+    use crate::error::Error;
+    use crate::exec::run;
+    use crate::macros::param;
+    use crate::router::Router;
+
+    param!(Home, GET, "/");
+    param!(Mounted, GET, "/mounted");
+
+    async fn home(_: Request<()>, _: Home) -> Result<&'static str, Error> {
+        Ok("home")
+    }
+
+    async fn mounted(_: Request<()>, _: Mounted) -> Result<&'static str, Error> {
+        Ok("mounted")
+    }
+
+    fn req(path: &'static str) -> Request<()> {
+        Request::builder()
+            .method(http::Method::GET)
+            .uri(http::Uri::from_static(path))
+            .body(())
+            .unwrap()
+    }
+
+    #[test]
+    fn test() {
+        let r1 = Router::new(home);
+        let r2 = Router::new(mounted);
+        let router = r1.mount("/prefix", r2);
+
+        let res = run(router, req("/"));
+        assert_eq!(res, Ok("home"));
+
+        let res = run(router, req("/prefix/mounted"));
+        assert_eq!(res, Ok("mounted"));
     }
 }

@@ -75,6 +75,11 @@ impl<R> Router<R> {
     }
 
     /// Mount a service at prefix.
+    ///
+    /// Any request to prefix will be delegated to the service with the prefix
+    /// stripped.
+    ///
+    /// *NOTE*: `prefix` will be stripped from any trailing slash.
     #[inline]
     pub fn mount<S, T, U, E>(self, prefix: &'static str, service: S) -> Router<Or<R, Mount<S>>>
     where
@@ -84,7 +89,10 @@ impl<R> Router<R> {
         E: From<Error>,
     {
         Router {
-            inner: Or::new(self.inner, Mount::new(service, prefix)),
+            inner: Or::new(
+                self.inner,
+                Mount::new(service, prefix.trim_end_matches('/')),
+            ),
         }
     }
 

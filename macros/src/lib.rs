@@ -12,11 +12,6 @@ pub fn derive(input: TokenStream) -> TokenStream {
         .into()
 }
 
-/// The attribute to describe route's spec.
-///
-/// See [`tackt`][1]'s documentation.
-///
-/// [1]: https://docs.rs/tackt/0.1
 #[proc_macro_attribute]
 pub fn route(args: TokenStream, item: TokenStream) -> TokenStream {
     route::route(args.into(), item.into())
