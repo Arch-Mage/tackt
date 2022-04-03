@@ -24,7 +24,6 @@ impl<S> Mount<S> {
         T: PathReq + RemovePrefix,
         S::Error: From<Error>,
     {
-        debug_assert!(!prefix.contains('?') && !prefix.contains('#'));
         Mount { inner, prefix }
     }
 }
@@ -50,9 +49,6 @@ where
     }
 
     fn call(&mut self, req: T) -> Self::Future {
-        if self.prefix.contains('?') {
-            return Maybe::ready(Err(Error::Prefix.into()));
-        };
         match req.remove_prefix(self.prefix) {
             Err(err) => Maybe::ready(Err(err.into())),
             Ok(req) => Maybe::Future(self.inner.call(req)),
@@ -73,8 +69,10 @@ where
     }
 
     fn param(&self, req: &T) -> Result<Self::Param, Error> {
-        use crate::param::Param;
-        Self::Param::from_request(req)
+        match req.path().starts_with(self.prefix) {
+            true => Ok(Param),
+            false => Err(Error::Path),
+        }
     }
 }
 
@@ -96,15 +94,25 @@ mod tests {
     use crate::macros::param;
     use crate::router::Router;
 
-    param!(Home, GET, "/");
-    param!(Mounted, GET, "/mounted");
+    param!(Root, GET, "/");
+    param!(Route1, GET, "/route1");
+    param!(Route2, GET, "/route2");
+    param!(Other, GET, "/other");
 
-    async fn home(_: Request<()>, _: Home) -> Result<&'static str, Error> {
-        Ok("home")
+    async fn root(_: Request<()>, _: Root) -> Result<&'static str, Error> {
+        Ok("root")
     }
 
-    async fn mounted(_: Request<()>, _: Mounted) -> Result<&'static str, Error> {
-        Ok("mounted")
+    async fn route1(_: Request<()>, _: Route1) -> Result<&'static str, Error> {
+        Ok("route1")
+    }
+
+    async fn route2(_: Request<()>, _: Route2) -> Result<&'static str, Error> {
+        Ok("route2")
+    }
+
+    async fn other(_: Request<()>, _: Other) -> Result<&'static str, Error> {
+        Ok("other")
     }
 
     fn req(path: &'static str) -> Request<()> {
@@ -117,15 +125,21 @@ mod tests {
 
     #[test]
     fn test() {
-        let root = Router::void();
-        let r1 = Router::new(home);
-        let r2 = Router::new(mounted);
-        let router = root.mount("/", r1).mount("/prefix", r2);
+        let root = Router::new(root).route(other);
+        let r1 = Router::new(route1);
+        let r2 = Router::new(route2);
+        let router = root.mount("/r1", r1).mount("/r2", r2);
 
         let res = run(router, req("/"));
-        assert_eq!(res, Ok("home"));
+        assert_eq!(res, Ok("root"));
 
-        let res = run(router, req("/prefix/mounted"));
-        assert_eq!(res, Ok("mounted"));
+        let res = run(router, req("/other"));
+        assert_eq!(res, Ok("other"));
+
+        let res = run(router, req("/r1/route1"));
+        assert_eq!(res, Ok("route1"));
+
+        let res = run(router, req("/r2/route2"));
+        assert_eq!(res, Ok("route2"));
     }
 }
