@@ -12,11 +12,16 @@ use crate::route::Route;
 ///
 /// Note that application code cannot construct this struct directly. This is
 /// exported for type annotation only.
-#[derive(Debug)]
 pub struct Func<F, P> {
     inner: F,
 
     param: PhantomData<P>,
+}
+
+impl<F, P> std::fmt::Debug for Func<F, P> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Func").finish()
+    }
 }
 
 impl<F, P> Func<F, P> {

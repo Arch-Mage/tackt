@@ -9,8 +9,13 @@ use crate::route::Route;
 /// Void, nothing.
 ///
 /// No one will find anything there.
-#[derive(Debug)]
 pub struct Void<T, U>(PhantomData<T>, PhantomData<U>);
+
+impl<T, U> std::fmt::Debug for Void<T, U> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("Void").finish()
+    }
+}
 
 impl<T, U> Void<T, U> {
     pub(crate) const fn new() -> Void<T, U> {
