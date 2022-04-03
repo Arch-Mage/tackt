@@ -2,7 +2,6 @@ use tower_service::Service;
 
 use crate::error::Error;
 use crate::future::Maybe;
-use crate::param::Through;
 use crate::request::PathReq;
 use crate::request::RemovePrefix;
 use crate::route::Route;
@@ -67,10 +66,24 @@ where
     T: PathReq + RemovePrefix,
     S::Error: From<Error>,
 {
-    type Param = Through;
+    type Param = Param;
 
     fn call_with_param(&mut self, req: T, _: Self::Param) -> Self::Future {
         self.call(req)
+    }
+
+    fn param(&self, req: &T) -> Result<Self::Param, Error> {
+        use crate::param::Param;
+        Self::Param::from_request(req)
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct Param;
+
+impl<T> crate::param::Param<T> for Param {
+    fn from_request(_: &T) -> Result<Self, Error> {
+        Ok(Param)
     }
 }
 

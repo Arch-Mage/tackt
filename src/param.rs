@@ -29,13 +29,3 @@ pub trait Param<T>: Sized {
     /// [4]: crate::router::Router::mount
     fn from_request(req: &T) -> Result<Self, Error>;
 }
-
-#[derive(Clone, Copy, Debug)]
-pub struct Through;
-
-impl<T> Param<T> for Through {
-    #[inline]
-    fn from_request(_: &T) -> Result<Self, Error> {
-        Ok(Through)
-    }
-}
