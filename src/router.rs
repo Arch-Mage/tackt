@@ -88,6 +88,16 @@ impl<R> Router<R> {
     /// stripped.
     ///
     /// *NOTE*: `prefix` will be stripped from any trailing slash.
+    ///
+    /// # Panic
+    ///
+    /// Panic if one of these conditions is met:
+    ///
+    /// 1. Prefix contains `?`.
+    /// 2. Prefix contains `#`.
+    /// 3. Prefix is empty.
+    /// 4. Prefix is `/`.
+    /// 5. Prefix does not start with `/`.
     #[inline]
     pub fn mount<S, T, U, E>(self, prefix: &'static str, service: S) -> Router<Or<R, Mount<S>>>
     where
@@ -96,11 +106,14 @@ impl<R> Router<R> {
         T: PathReq + RemovePrefix,
         E: From<Error>,
     {
+        let prefix = prefix.trim_end_matches('/');
+        assert!(!prefix.contains('?'), "Prefix cannot contains '?'");
+        assert!(!prefix.contains('#'), "Prefix cannot contains '#'");
+        assert!(!prefix.is_empty(), "Prefix cannot be empty");
+        assert!(prefix != "/", "Prefix cannot be '/'");
+        assert!(prefix.starts_with('/'), "Prefix must be starts with '/'");
         Router {
-            inner: Or::new(
-                self.inner,
-                Mount::new(service, prefix.trim_end_matches('/')),
-            ),
+            inner: Or::new(self.inner, Mount::new(service, prefix)),
         }
     }
 
