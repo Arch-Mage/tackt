@@ -18,16 +18,8 @@ where
     R: param::Param<T>,
 {
     #[inline]
-    fn from_request(req: &T) -> Result<Self, Error> {
-        let err1 = match L::from_request(req) {
-            Err(err) => err,
-            Ok(data) => return Ok(Self::Left(data)),
-        };
-        let err2 = match R::from_request(req) {
-            Err(err) => err,
-            Ok(data) => return Ok(Self::Right(data)),
-        };
-        Err(std::cmp::min(err1, err2))
+    fn from_request(_: &T) -> Result<Self, Error> {
+        panic!("BUG: or should call param from Route trait.");
     }
 }
 
@@ -97,6 +89,18 @@ where
                 Maybe::Future(Either::Right(self.right.call_with_param(req, param)))
             }
         }
+    }
+
+    fn param(&self, req: &T) -> Result<Self::Param, Error> {
+        let err1 = match self.left.param(req) {
+            Err(err) => err,
+            Ok(param) => return Ok(Param::Left(param)),
+        };
+        let err2 = match self.right.param(req) {
+            Err(err) => err,
+            Ok(param) => return Ok(Param::Right(param)),
+        };
+        Err(std::cmp::min(err1, err2))
     }
 }
 
